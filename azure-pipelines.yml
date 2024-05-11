@@ -11,7 +11,7 @@ resources:
 - repo: self
 
 variables:
-  tag: '1.00'
+  tag: 'latest'
 
 stages:
 - stage: Build
@@ -26,4 +26,4 @@ stages:
       inputs:
         containerregistrytype: 'Azure Container Registry'
         dockerComposeFile: '**/docker-compose.yml'
-        action: 'docker-compose up'
+        action: docker-compose up
