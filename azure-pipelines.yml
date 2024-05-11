@@ -1,28 +1,24 @@
-
-
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
-- main
+  - main
 
 resources:
-- repo: self
+  - repo: self
 
 variables:
   tag: '$(Build.BuildId)'
+
 stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: DockerCompose@0
-      inputs:
-        containerregistrytype: 'Azure Container Registry'
-        dockerComposeFile: '**/docker-compose.yml'
-        action: docker-compose up
+  - stage: Build
+    displayName: Build image
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: DockerCompose@0
+            inputs:
+              containerregistrytype: 'Azure Container Registry'
+              dockerComposeFile: '**/docker-compose.yml'
+              action: 'Build services'
+              additionalImageTags: '$(tag)'  # Added additionalImageTags to tag the Docker image
