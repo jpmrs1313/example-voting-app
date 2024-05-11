@@ -18,3 +18,8 @@ stages:
               containerregistrytype: 'Azure Container Registry'
               dockerComposeFile: '**/docker-compose.yml'
               action: 'Build services'
+
+          - task: ShellScript@2
+            displayName: 'Run Docker Compose Up'
+            inputs:
+              scriptPath: 'scripts/run-docker-compose.sh'
