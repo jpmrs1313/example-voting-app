@@ -4,9 +4,6 @@ trigger:
 resources:
   - repo: self
 
-variables:
-  tag: '$(Build.BuildId)'
-
 stages:
   - stage: Build
     displayName: Build image
@@ -21,4 +18,3 @@ stages:
               containerregistrytype: 'Azure Container Registry'
               dockerComposeFile: '**/docker-compose.yml'
               action: 'Build services'
-              additionalImageTags: '$(tag)'  # Added additionalImageTags to tag the Docker image
