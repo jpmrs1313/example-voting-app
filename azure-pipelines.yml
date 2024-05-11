@@ -11,7 +11,7 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  tag: '1.00'
 
 stages:
 - stage: Build
