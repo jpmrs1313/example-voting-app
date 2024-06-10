@@ -8,6 +8,13 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - vote
+          - worker
+          - result
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -18,26 +25,27 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Build and push Docker image for vote
-        uses: docker/build-push-action@v5
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Cache Docker layers
+        uses: actions/cache@v3
         with:
-          context: ./vote
-          file: ./vote/Dockerfile
-          push: true
-          tags: jpmrs1313/vote:latest
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
-      - name: Build and push Docker image for worker
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./worker
-          file: ./worker/Dockerfile
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
           push: true
-          tags: jpmrs1313/result:latest
-
-      - name: Build and push Docker image for result
-        uses: docker/build-push-action@v5
-        with:
-          context: ./result
-          file: ./result/Dockerfile
-          push: true
-          tags: jpmrs1313/result:latest
+          tags: jpmrs1313/${{ matrix.service }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+      
+      - name: Move cache
+        if: success()
+        run: mv /tmp/.buildx-cache-new /tmp/.buildx-cache
