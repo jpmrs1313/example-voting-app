@@ -49,3 +49,6 @@ jobs:
       - name: Sync new cache to existing cache
         if: success()
         run: rsync -a /tmp/.buildx-cache-new/ /tmp/.buildx-cache/
+
+      - name: Docker Compose up
+        run: docker-compose up -d
