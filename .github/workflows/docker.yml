@@ -26,10 +26,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3 # Updated to the latest version supporting Node.js 20
+        uses: docker/setup-buildx-action@v3
       
       - name: Cache Docker layers
-        uses: actions/cache@v4 # Updated to the latest version supporting Node.js 20
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -46,11 +46,9 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       
-      - name: Sync new cache to existing cache
-        if: success()
-        run: rsync -a /tmp/.buildx-cache-new/ /tmp/.buildx-cache/
-
       - name: Deploy to DigitalOcean Droplet
         if: success()
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} root@164.92.179.200 'cd /example-vote-app && docker-compose up -d'
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key.pem
+          chmod 600 ssh_key.pem
+          ssh -i ./ssh_key.pem root@164.92.179.200 'cd /example-vote-app && docker-compose up -d'
