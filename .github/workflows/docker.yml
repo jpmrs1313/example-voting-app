@@ -19,13 +19,6 @@ jobs:
           - vote
           - worker
           - result
-        include:
-          - service: vote
-            path: 'vote/**'
-          - service: worker
-            path: 'worker/**'
-          - service: result
-            path: 'result/**'
 
     steps:
       - name: Check out repository
@@ -42,8 +35,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-${{ matrix.service }}-
 
+      - name: Determine if build is needed
+        id: check_changes
+        run: |
+          if git diff --quiet HEAD^ HEAD -- ${{ matrix.service }}/; then
+            echo "changes=false" >> $GITHUB_ENV
+          else
+            echo "changes=true" >> $GITHUB_ENV
+        shell: bash
+
       - name: Build and push Docker image
-        if: contains(github.event.head_commit.message, matrix.path)
+        if: env.changes == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.service }}
@@ -54,5 +56,9 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       - name: Move cache
-        if: success()
-        run: mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        if: env.changes == 'true' && !failure()
+        run: |
+          if [ -d /tmp/.buildx-cache-new ]; then
+            mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          fi
+        shell: bash
