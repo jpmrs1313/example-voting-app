@@ -59,6 +59,15 @@ jobs:
             sudo usermod -aG docker $USER
             newgrp docker
 
+      - name: Remove existing docker-compose file
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            rm -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml
+
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.4
         with:
