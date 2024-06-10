@@ -53,4 +53,4 @@ jobs:
       - name: Deploy to DigitalOcean Droplet
         if: success()
         run: |
-          ssh root@164.92.179.200 'cd /example-vote-app && docker-compose up -d'
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} root@164.92.179.200 'cd /example-vote-app && docker-compose up -d'
