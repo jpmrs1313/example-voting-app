@@ -47,8 +47,10 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       
       - name: Deploy to DigitalOcean Droplet
-        if: success()
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ssh_key.pem
-          chmod 600 ssh_key.pem
-          ssh -i ./ssh_key.pem root@164.92.179.200 'cd /example-vote-app && docker-compose up -d'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            docker ps
