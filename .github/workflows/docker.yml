@@ -35,18 +35,16 @@ jobs:
             docker push jpmrs1313/$service:latest
           done
 
-      - name: Install Docker on Droplet
+      - name: Install Docker Compose
+        if: steps.check-docker.outputs.docker_installed == 'false'
         uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sh get-docker.sh
-            sudo groupadd docker || true
-            sudo usermod -aG docker $USER
-            newgrp docker
+            sudo curl -L "https://github.com/docker/compose/releases/download/<VERSION>/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
 
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.4
