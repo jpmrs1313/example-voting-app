@@ -51,6 +51,6 @@ jobs:
         run: rsync -a /tmp/.buildx-cache-new/ /tmp/.buildx-cache/
 
       - name: Deploy to DigitalOcean Droplet
-              if: success()
-              run: |
-                ssh root@164.92.179.200 'cd /example-vote-app && docker-compose up -d'
+        if: success()
+        run: |
+          ssh root@164.92.179.200 'cd /example-vote-app && docker-compose up -d'
