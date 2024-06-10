@@ -1,14 +1,13 @@
-name: CI
+name: ci
 
 on:
   push:
     branches:
-      - main
+      - 'main'
 
 jobs:
-  build-and-deploy:
+  docker:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         service:
@@ -20,6 +19,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -27,12 +35,36 @@ jobs:
           file: ./${{ matrix.service }}/Dockerfile
           push: true
           tags: jpmrs1313/${{ matrix.service }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
 
-      - name: SSH into Droplet and deploy
+      - name: Install Docker on Droplet
         uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            docker-compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml up -d
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sh get-docker.sh
+            sudo groupadd docker || true
+            sudo usermod -aG docker $USER
+            newgrp docker
+
+      - name: Copy docker-compose file to Droplet
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: ./docker-compose.images.yml
+          target: /home/${{ secrets.SSH_USERNAME }}
+
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml up -d
