@@ -46,6 +46,6 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       
-      - name: Move cache
+      - name: Sync new cache to existing cache
         if: success()
-        run: mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        run: rsync -a /tmp/.buildx-cache-new/ /tmp/.buildx-cache/
