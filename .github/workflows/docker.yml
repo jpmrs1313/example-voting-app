@@ -51,4 +51,4 @@ jobs:
         run: rsync -a /tmp/.buildx-cache-new/ /tmp/.buildx-cache/
 
       - name: Docker Compose up
-        run: docker-compose up -d
+        run: docker-compose up -d -f docker-compose.images
