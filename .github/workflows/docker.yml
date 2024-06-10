@@ -23,11 +23,15 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push Docker images
-        run: |
-          for service in vote worker result; do
-            docker/build-push-action@v5 --context ./${service} --file ./${service}/Dockerfile --push --tags jpmrs1313/${service}:latest --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache-new
-          done
-
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ service }}
+          file: ./${{ service }}/Dockerfile
+          push: true
+          tags: jpmrs1313/${{ service }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          
       - name: Install Docker on Droplet
         uses: appleboy/ssh-action@v0.1.4
         with:
