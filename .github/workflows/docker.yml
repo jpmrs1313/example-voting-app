@@ -18,7 +18,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
-      - name: Build and push Docker image to registry
+      - name: Build and push Docker image for vote
+        uses: docker/build-push-action@v5
+        with:
+          context: ./vote
+          file: ./vote/Dockerfile
+          push: true
+          tags: jpmrs1313/vote:latest
+
+      - name: Build and push Docker image for result
         uses: docker/build-push-action@v5
         with:
           context: ./vote
