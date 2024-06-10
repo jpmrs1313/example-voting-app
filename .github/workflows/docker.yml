@@ -56,6 +56,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           source: ./docker-compose.images.yml
           target: /home/${{ secrets.SSH_USERNAME }}
+          overwrite: true
 
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v0.1.4
