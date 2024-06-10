@@ -1,0 +1,19 @@
+name: Docker Series Builds
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker build result 
+        run: |
+          docker build ./result -t examplevotingapp_result
+      - name: docker build worker
+        run: |
+          docker build ./worker -t examplevotingapp_worker
+      - name: docker build vote
+        run: |
+          docker build ./vote -t examplevotingapp_vote
