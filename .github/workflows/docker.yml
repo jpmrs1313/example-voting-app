@@ -8,8 +8,11 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+
     env:
-      service: my_service_name   # Define your service name here
+      SERVICE1: result
+      SERVICE2: vote
+      SERVICE3: worker
 
     steps:
       - name: Check out repository
@@ -25,14 +28,12 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push Docker images
-        uses: docker/build-push-action@v5
-        with:
-          context: ./${{ env.service }}
-          file: ./${{ env.service }}/Dockerfile
-          push: true
-          tags: jpmrs1313/${{ env.service }}:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
+        run: |
+          for service in $SERVICE1 $SERVICE2 $SERVICE3; do
+            echo "Building and pushing Docker image for $service"
+            docker build -t jpmrs1313/$service:latest ./$service
+            docker push jpmrs1313/$service:latest
+          done
 
       - name: Install Docker on Droplet
         uses: appleboy/ssh-action@v0.1.4
@@ -63,4 +64,5 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            docker compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml
+            # Adjust the deployment command according to your needs
+            docker-compose -f /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml up -d
