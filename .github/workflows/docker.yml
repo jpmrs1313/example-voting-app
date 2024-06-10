@@ -52,5 +52,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          script: |
-            docker compose up -d -f docker-compose.images.yml
+          script: whoami
