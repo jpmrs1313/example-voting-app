@@ -4,16 +4,16 @@ on: [push]
 
 jobs:
   build:
+    name: Build docker container image
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
       - uses: actions/checkout@v2
-      - name: docker build result 
-        run: |
-          docker build ./result -t examplevotingapp_result
-      - name: docker build worker
-        run: |
-          docker build ./worker -t examplevotingapp_worker
-      - name: docker build vote
-        run: |
-          docker build ./vote -t examplevotingapp_vote
+      - name: Publish to Docker Hub
+        uses: docker/build-push-action@v1
+        with: 
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD}}
+          repository: jpmrs1313/example_voting_app
+          tags: latest, ${{ github.run_number}}
