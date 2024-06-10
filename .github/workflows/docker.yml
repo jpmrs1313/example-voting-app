@@ -24,4 +24,4 @@ jobs:
           context: ./vote
           file: ./vote/Dockerfile
           push: true
-          tags: user/result:latest
+          tags: jpmrs1313/result:latest
