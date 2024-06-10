@@ -26,10 +26,18 @@ jobs:
           push: true
           tags: jpmrs1313/vote:latest
 
+      - name: Build and push Docker image for worker
+        uses: docker/build-push-action@v5
+        with:
+          context: ./worker
+          file: ./worker/Dockerfile
+          push: true
+          tags: jpmrs1313/result:latest
+
       - name: Build and push Docker image for result
         uses: docker/build-push-action@v5
         with:
-          context: ./vote
-          file: ./vote/Dockerfile
+          context: ./result
+          file: ./result/Dockerfile
           push: true
           tags: jpmrs1313/result:latest
