@@ -47,7 +47,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
       - name: Install Docker on Droplet
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -60,7 +60,7 @@ jobs:
             newgrp docker
 
       - name: Copy docker-compose file to Droplet
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -69,7 +69,7 @@ jobs:
           target: /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml
 
       - name: Deploy to DigitalOcean Droplet
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
