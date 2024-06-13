@@ -63,5 +63,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
+            sudo systemctl start docker
             cd /home/${{ secrets.SSH_USERNAME }}/project
             docker-compose -f docker-compose.images.yml up -d
