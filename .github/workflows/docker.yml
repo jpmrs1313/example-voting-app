@@ -63,5 +63,5 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd /home/${{ secrets.SSH_USERNAME }}
+            cd root
             docker-compose -f docker-compose.images.yml up -d
