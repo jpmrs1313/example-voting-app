@@ -36,16 +36,16 @@ jobs:
           done
 
       - name: Install Docker Compose
-        if: steps.check-docker.outputs.docker_installed == 'false'
         uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-
+            if ! [ -x "$(command -v docker-compose)" ]; then
+              sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
 
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.4
@@ -53,8 +53,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: docker-compose.images.yml
-          target: docker-compose.images.yml
+          source: ./docker-compose.images.yml
+          target: /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml
 
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v0.1.4
@@ -63,6 +63,5 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
+            cd /home/${{ secrets.SSH_USERNAME }}
             docker-compose -f docker-compose.images.yml up -d
