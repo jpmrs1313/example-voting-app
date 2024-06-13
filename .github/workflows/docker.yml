@@ -8,34 +8,41 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [result, vote, worker]
 
     env:
-      SERVICE1: result
-      SERVICE2: vote
-      SERVICE3: worker
+      DOCKER_IMAGE_NAME: jpmrs1313/${{ matrix.service }}:latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Login to Docker registry
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.service }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.service }}-
 
-      - name: Build and push Docker images
+      - name: Build and push Docker image
         run: |
-          for service in $SERVICE1 $SERVICE2 $SERVICE3; do
-            echo "Building and pushing Docker image for $service"
-            docker build -t jpmrs1313/$service:latest ./$service
-            docker push jpmrs1313/$service:latest
-          done
+          echo "Building and pushing Docker image for ${{ matrix.service }}"
+          docker build -t $DOCKER_IMAGE_NAME ./${{ matrix.service }} --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache
+          docker push $DOCKER_IMAGE_NAME
 
-      - name: Install Docker Compose
+      - name: Check if Docker Compose is installed
         uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -65,3 +72,29 @@ jobs:
           script: |
             cd /home/${{ secrets.SSH_USERNAME }}
             docker-compose -f docker-compose.images.yml up -d
+
+      - name: Notify on success
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const github = require('@actions/github');
+            const context = github.context;
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: "Deployment successful for ${{ matrix.service }}."
+            });
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const github = require('@actions/github');
+            const context = github.context;
+            github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: "Deployment failed for ${{ matrix.service }}."
+            });
