@@ -54,7 +54,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           source: ./docker-compose.images.yml
-          target: /home/${{ secrets.SSH_USERNAME }}/docker-compose.images.yml
+          target: /home/${{ secrets.SSH_USERNAME }}/project
 
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v0.1.4
@@ -63,5 +63,5 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd root
+            cd /home/${{ secrets.SSH_USERNAME }}/project
             docker-compose -f docker-compose.images.yml up -d
