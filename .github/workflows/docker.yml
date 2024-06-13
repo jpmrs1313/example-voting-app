@@ -54,7 +54,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           source: docker-compose.images.yml
-          target: /docker-compose.images.yml
+          target: docker-compose.images.yml
 
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v0.1.4
