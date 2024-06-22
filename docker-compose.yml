@@ -84,17 +84,15 @@ services:
       - back-tier
     restart: "no"
 
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - vote
-      - result
-    networks:
-      - back-tier
+   nginx:
+      image: nginx:latest
+      ports:
+        - "1000:80"
+      volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf
+      depends_on:
+        - vote
+        - result
 
 volumes:
   db-data:
