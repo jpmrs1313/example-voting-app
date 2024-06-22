@@ -65,6 +65,15 @@ jobs:
           source: ./docker-compose.images.yml
           target: /home/${{ secrets.SSH_USERNAME }}/project
 
+      - name: Copy healthcheck files to Droplet
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: ./healthchecks
+          target: /home/${{ secrets.SSH_USERNAME }}/project
+
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v0.1.4
         with:
