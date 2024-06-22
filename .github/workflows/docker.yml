@@ -36,7 +36,14 @@ jobs:
           script: |
             # Install Docker
             sudo apt-get update
-	@@ -39,13 +47,12 @@ jobs:
+            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            sudo usermod -aG docker ${{ secrets.SSH_USERNAME }}
             # Install Docker Compose
             sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
             sudo chmod +x /usr/local/bin/docker-compose
@@ -49,7 +56,8 @@ jobs:
           source: ./docker-compose.images.yml
           target: /home/${{ secrets.SSH_USERNAME }}/project
 
-	@@ -54,7 +61,7 @@ jobs:
+      - name: Copy healthcheck files to Droplet
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -57,7 +65,8 @@ jobs:
           source: ./healthchecks
           target: /home/${{ secrets.SSH_USERNAME }}/project
 
-	@@ -63,7 +70,7 @@ jobs:
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -65,3 +74,4 @@ jobs:
           script: |
             source ~/.profile
             cd /home/${{ secrets.SSH_USERNAME }}/project
+            docker-compose -f docker-compose.images.yml up -d
