@@ -20,7 +20,7 @@ jobs:
 
      
       - name: Install Docker and Docker Compose on remote server
-         uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
