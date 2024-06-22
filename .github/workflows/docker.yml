@@ -20,11 +20,11 @@ jobs:
 
      
       - name: Install Docker and Docker Compose on remote server
-        uses: appleboy/ssh-action@v0.1.4
+         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
           script: |
             # Install Docker
             sudo apt-get update
