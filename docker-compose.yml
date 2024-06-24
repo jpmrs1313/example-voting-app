@@ -1,7 +1,6 @@
-version: "3.8"
-
 services:
-  vote:
+
+  vote: 
     build: 
       context: ./vote
       target: dev
@@ -19,6 +18,7 @@ services:
     ports:
       - "5000:80"
     networks:
+      - front-tier
       - back-tier
 
   result:
@@ -34,6 +34,7 @@ services:
       - "5001:80"
       - "127.0.0.1:9229:9229"
     networks:
+      - front-tier
       - back-tier
 
   worker:
@@ -46,7 +47,6 @@ services:
         condition: service_healthy 
     networks:
       - back-tier
-
   redis:
     image: redis:alpine
     volumes:
@@ -70,7 +70,6 @@ services:
       interval: "5s"
     networks:
       - back-tier
-
   # this service runs once to seed the database with votes
   # it won't run unless you specify the "seed" profile
   # docker compose --profile seed up -d
@@ -81,21 +80,12 @@ services:
       vote:
         condition: service_healthy 
     networks:
-      - back-tier
+      - front-tier
     restart: "no"
-
-   nginx:
-      image: nginx:latest
-      ports:
-        - "1000:80"
-      volumes:
-        - ./nginx.conf:/etc/nginx/nginx.conf
-      depends_on:
-        - vote
-        - result
 
 volumes:
   db-data:
 
 networks:
+  front-tier:
   back-tier:
