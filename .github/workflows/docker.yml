@@ -20,11 +20,12 @@ jobs:
           USER: ${{ secrets.SSH_USER }}
           DEPLOYMENT_PATH: "/opt/services/"
         run: |
-          eval "$(ssh-agent -s)"
-          ssh-add <(echo "${{ secrets.SSH_KEY }}")
+          eval $(ssh-agent -s)
+          mkdir -p ~/.ssh
+          echo "${{secrets.SSH_KEY}}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh $USER@$HOST -T  "ls -la"
           
-          ssh -o StrictHostKeyChecking=no $USER@$HOST "ls -la"
-
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.4
         with:
