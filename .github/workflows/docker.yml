@@ -23,6 +23,9 @@ jobs:
           eval $(ssh-agent -s)
           mkdir -p ~/.ssh
           echo "${{secrets.SSH_KEY}}" > ~/.ssh/id_rsa
+          echo "$USER"
+          echo "$HOST"
+          cat  ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh $USER@$HOST -T  "ls -la"
           
