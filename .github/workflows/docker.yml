@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        
+
       - name: Install Docker and Docker Compose on remote server
         env:
           HOST: ${{ secrets.SSH_HOST }}
@@ -22,19 +22,20 @@ jobs:
         run: |
           eval $(ssh-agent -s)
           mkdir -p ~/.ssh
-          echo "${{secrets.SSH_KEY}}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          rsync -avz -e "ssh -o 'StrictHostKeyChecking=no'" "docker-compose.yml" "${{ USER }}@${HOST}:${DEPLOYMENT_PATH}"
-          ssh ${{ USER }}@${HOST} -T "cd ${{ DEPLOYMENT_PATH }} && rm -f .env"
-          ssh ${{ USER }}@${HOST} -T "\
-            cd ${{ DEPLOYMENT_PATH }} && \
-            sudo apt-get update && \
-            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release && \
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null  && \
-            sudo apt-get update  && \
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io \
-            "
-            
+          rsync -avz -e "ssh -o 'StrictHostKeyChecking=no'" "docker-compose.yml" "${{ USER }}@${{ HOST }}:${DEPLOYMENT_PATH}"
+          ssh -o StrictHostKeyChecking=no ${{ USER }}@${{ HOST }} -T << 'EOF'
+            cd ${{ DEPLOYMENT_PATH }}
+            rm -f .env
+            sudo apt-get update
+            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          EOF
+
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.4
         with:
