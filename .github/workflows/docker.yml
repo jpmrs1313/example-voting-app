@@ -27,7 +27,7 @@ jobs:
           echo "$HOST"
           cat  ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -v $USER@$HOST -T  "ls -la"
+          ssh -v  -o StrictHostKeyChecking=no $USER@$HOST -T  "ls -la"
           
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.4
