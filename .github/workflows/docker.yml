@@ -23,7 +23,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{secrets.SSH_KEY}}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          rsync -avz -e "ssh -o 'StrictHostKeyChecking=no'" "docker-compose.yml" "${{ secrets.SSH_USER }}@${SSH_HOST}:${DEPLOYMENT_PATH}"
+          rsync -avz -e "ssh -o 'StrictHostKeyChecking=no'" "docker-compose.yml" "${{ secrets.SSH_USER }}@${HOST}:${DEPLOYMENT_PATH}"
           ssh ${{ secrets.SSH_USER }}@${HOST} -T "cd ${{ env.DEPLOYMENT_PATH }} && rm -f .env"
           ssh ${{ secrets.CI_USER }}@${HOST} -T "\
             cd ${{ env.DEPLOYMENT_PATH }} && \
