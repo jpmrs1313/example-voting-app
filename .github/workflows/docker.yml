@@ -22,7 +22,7 @@ jobs:
         run: |
           eval $(ssh-agent -s)
           mkdir -p ~/.ssh
-          echo "${{secrets.SSH_KEY}}" > ~/.ssh/id_rsa
+          echo "${{vars.SSH_KEY}}" > ~/.ssh/id_rsa
           echo "$USER"
           echo "$HOST"
           cat  ~/.ssh/id_rsa
