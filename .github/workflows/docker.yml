@@ -25,6 +25,7 @@ jobs:
           echo "${{vars.SSH_KEY}}" > ~/.ssh/id_rsa
           echo "$USER"
           echo "$HOST"
+          echo "${{vars.SSH_KEY}}"
           cat  ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh $USER@$HOST -T  "ls -la"
