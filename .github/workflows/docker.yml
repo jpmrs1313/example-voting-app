@@ -23,7 +23,7 @@ jobs:
           eval "$(ssh-agent -s)"
           ssh-add <(echo "${{ secrets.SSH_KEY }}")
           
-          ssh -o StrictHostKeyChecking=no ${{ USER }}@${{ HOST }} "cd $DEPLOYMENT_PATH && \
+          ssh -o StrictHostKeyChecking=no $USER@$HOST "cd $DEPLOYMENT_PATH && \
             rm -f .env && \
             sudo apt-get update && \
             sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release && \
