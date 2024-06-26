@@ -20,20 +20,17 @@ jobs:
           USER: ${{ secrets.SSH_USER }}
           DEPLOYMENT_PATH: "/opt/services/"
         run: |
-          eval $(ssh-agent -s)
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          rsync -avz -e "ssh -o 'StrictHostKeyChecking=no'" "docker-compose.yml" "${{ USER }}@${{ HOST }}:${DEPLOYMENT_PATH}"
-          ssh -o StrictHostKeyChecking=no ${{ USER }}@${{ HOST }} -T << 'EOF'
-            cd ${{ DEPLOYMENT_PATH }}
-            rm -f .env
-            sudo apt-get update
-            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-            sudo apt-get update
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          eval "$(ssh-agent -s)"
+          ssh-add <(echo "${{ secrets.SSH_KEY }}")
+          
+          ssh -o StrictHostKeyChecking=no ${{ USER }}@${{ HOST }} "cd $DEPLOYMENT_PATH && \
+            rm -f .env && \
+            sudo apt-get update && \
+            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release && \
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+            echo \"deb [arch=\$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \$(lsb_release -cs) stable\" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+            sudo apt-get update && \
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io"
 
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.4
