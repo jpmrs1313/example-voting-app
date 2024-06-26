@@ -17,7 +17,7 @@ jobs:
       - name: Install Docker and Docker Compose on remote server
         env:
           HOST: ${{ secrets.SSH_HOST }}
-          USER: ${{ secrets.SSH_USER }}
+          USER: ${{ secrets.SSH_USERNAME }}
           DEPLOYMENT_PATH: "/opt/services/"
         run: |
           eval $(ssh-agent -s)
