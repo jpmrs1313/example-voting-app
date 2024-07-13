@@ -1,4 +1,11 @@
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_redirect
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
 
   vote: 
     build: 
