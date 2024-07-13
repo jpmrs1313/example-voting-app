@@ -21,4 +21,4 @@ jobs:
           script: |
             source ~/.profile
             cd /home/${{ secrets.SSH_USERNAME }}/project
-            docker-compose -f docker-compose.images.yml up -d
+            docker-compose -f docker-compose.yml up -d
