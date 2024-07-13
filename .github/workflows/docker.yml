@@ -69,6 +69,15 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: ./healthchecks
           target: /home/${{ secrets.SSH_USERNAME }}/project
+       
+      - name: Copy nginx file to Droplet
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: ./nginx.conf
+          target: /home/${{ secrets.SSH_USERNAME }}/project
 
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v1.0.3
