@@ -58,7 +58,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: ./docker-compose.yml
+          source: ./docker-compose.images.yml
           target: /home/${{ secrets.SSH_USERNAME }}/project
 
       - name: Copy healthcheck files to Droplet
@@ -79,4 +79,4 @@ jobs:
           script: |
             source ~/.profile
             cd /home/${{ secrets.SSH_USERNAME }}/project
-            docker-compose -f docker-compose.yml up -d
+            docker-compose -f docker-compose.images.yml up -d
