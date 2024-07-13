@@ -11,65 +11,7 @@ jobs:
       SERVICE2: vote
       SERVICE3: worker
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Login to Docker registry
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push Docker images
-        run: |
-          for service in $SERVICE1 $SERVICE2 $SERVICE3; do
-            echo "Building and pushing Docker image for $service"
-            docker build -t jpmrs1313/$service:latest ./$service
-            docker push jpmrs1313/$service:latest
-          done
-          
-      - name: Install Docker and Docker Compose on remote server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            # Install Docker
-            sudo apt-get update
-            sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-            sudo apt-get update
-            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-            sudo systemctl start docker
-            sudo systemctl enable docker
-            sudo usermod -aG docker ${{ secrets.SSH_USERNAME }}
-            # Install Docker Compose
-            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-            
-      - name: Copy docker-compose file to Droplet
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          source: ./docker-compose.images.yml
-          target: /home/${{ secrets.SSH_USERNAME }}/project
-          
-      - name: Copy healthcheck files to Droplet
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          source: ./healthchecks
-          target: /home/${{ secrets.SSH_USERNAME }}/project
-          
+    
       - name: Deploy to DigitalOcean Droplet
         uses: appleboy/ssh-action@v1.0.3
         with:
