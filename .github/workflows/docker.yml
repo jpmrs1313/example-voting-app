@@ -22,7 +22,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       # - name: Build and push Docker images
       #   run: |
       #     for service in $SERVICE1 $SERVICE2 $SERVICE3; do
@@ -50,8 +49,8 @@ jobs:
       #       sudo usermod -aG docker ${{ secrets.SSH_USERNAME }}
       #       # Install Docker Compose
       #       sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-      #       sudo chmod +x /usr/local/bin/docker-compose
-            
+      #       sudo chmod +x /usr/local/bin/docker-compose        
+
       - name: Copy docker-compose file to Droplet
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -69,7 +68,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: ./healthchecks
           target: /home/${{ secrets.SSH_USERNAME }}/project
-       
+
       - name: Copy nginx file to Droplet
         uses: appleboy/scp-action@v0.1.7
         with:
