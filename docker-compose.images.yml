@@ -1,3 +1,8 @@
+# for running in docker compose with prebuilt images
+# version is now using "compose spec"
+# v2 and v3 are now combined!
+# docker-compose v1.27+ required
+
 services:
   nginx:
     image: nginx:latest
@@ -6,7 +11,6 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      
   vote:
     image: jpmrs1313/vote
     depends_on:
@@ -17,7 +21,6 @@ services:
     networks:
       - front-tier
       - back-tier
-
   result:
     image: jpmrs1313/result
     depends_on:
@@ -28,7 +31,6 @@ services:
     networks:
       - front-tier
       - back-tier
-
   worker:
     image: jpmrs1313/worker
     depends_on:
@@ -38,18 +40,15 @@ services:
         condition: service_healthy 
     networks:
       - back-tier
-
   redis:
     image: redis:alpine
     volumes:
       - "./healthchecks:/healthchecks"
     healthcheck:
-      test: ["CMD", "/healthchecks/redis.sh"]
-      interval: 5s
-      retries: 3
+      test: /healthchecks/redis.sh
+      interval: "5s"
     networks:
       - back-tier
-
   db:
     image: postgres:15-alpine
     environment:
@@ -59,9 +58,8 @@ services:
       - "db-data:/var/lib/postgresql/data"
       - "./healthchecks:/healthchecks"
     healthcheck:
-      test: ["CMD-SHELL", "/healthchecks/postgres.sh"]
-      interval: 5s
-      retries: 3
+      test: /healthchecks/postgres.sh
+      interval: "5s"
     networks:
       - back-tier
 
