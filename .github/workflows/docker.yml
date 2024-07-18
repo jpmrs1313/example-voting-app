@@ -31,7 +31,7 @@ jobs:
       #       docker push jpmrs1313/$service:latest
       #     done
           
-      # - name: Install Docker and Docker Compose on remote server
+      - name: Install Docker and Docker Compose on remote server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
