@@ -10,7 +10,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./server.conf:/etc/nginx/conf.d/server.conf
   vote:
     image: jpmrs1313/vote
     depends_on:
