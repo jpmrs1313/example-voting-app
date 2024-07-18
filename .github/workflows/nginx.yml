@@ -1,1 +1,29 @@
 
+name: nginx
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy nginx file to Droplet
+        uses: appleboy/scp-action@v0.1.7
+        with:
+           host: ${{ secrets.SSH_HOST }}
+           username: ${{ secrets.SSH_USERNAME }}
+           key: ${{ secrets.SSH_KEY }}
+           source: ./nginx.conf
+           target: /home/${{ secrets.SSH_USERNAME }}/project
+
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            source ~/.profile
+            cd /home/${{ secrets.SSH_USERNAME }}/project
+            docker-compose -f docker-compose.images.yml up -d
