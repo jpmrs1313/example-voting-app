@@ -76,7 +76,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: ./server.conf
+          source: ./conf.conf
           target: /home/${{ secrets.SSH_USERNAME }}/project
 
       - name: Deploy to DigitalOcean Droplet
